@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>P5 A*</title>
+    <link rel="stylesheet" href="includes/css/custom.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="includes/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="includes/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="includes/images/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+
+    <div id="ui_area">
+        <div id="left_panel">
+            <fieldset>
+                <legend style="color:blue;font-weight:bold;">Debug Information</legend>
+                <table>
+                    <tr>
+                        <td>Nodex.x:</td>
+                        <td id="debug_nodeX"></td>
+                    </tr>
+                    <tr>
+                        <td>Node.y:</td>
+                        <td id="debug_nodeY"></td>
+                    </tr>
+                    <tr>
+                        <td>Node.id:</td>
+                        <td id="debug_id"></td>
+                    </tr>
+                </table>
+            </fieldset>
+        </div>
+
+        <div id="center_panel">
+            <fieldset>
+                <legend style="color:blue;font-weight:bold;">Grid Information</legend>
+                <label for="selectGridSize">Grid Size:</label>
+                <select id="selectGridSize" name="selectGridSize">
+                    <option value="5">5x5</option>
+                    <option value="10">10x10</option>
+                    <option value="15" selected="selected">15x15</option>
+                    <option value="20">20x20</option>
+                    <option value="30">30x30</option>
+                    <option value="40">40x40</option>
+                    <option value="50">50x50</option>
+                    <option value="100">100x100</option>
+                    <option value="150">150x150</option>
+                </select>
+                <br>
+                <label for="selectWallFrequency">Wall Frequency: </label>
+                <select id="selectWallFrequency">
+                    <option value="0">None</option>
+                    <option value=".1">10%</option>
+                    <option value=".2" selected="selected">20%</option>
+                    <option value=".3">30%</option>
+                    <option value=".4">40%</option>
+                </select>
+            </fieldset>
+            <button type="button" id="updateGrid" onclick="updateGrid()">Update Grid!</button>
+            <button type="button" id="goForIt" onclick="goForIt()">Go For It!</button>
+        </div>
+
+        <div id="right_panel">
+
+            <fieldset>
+                <legend style="color:blue;font-weight:bold;">Left Mouse</legend>
+                    <label>Get Info:</label>
+                    <input type="radio" name="id" id="checkInfo" value="checkInfo" checked="true">
+                    <br>
+                    <label>Select Source:</label>
+                    <input type="radio" name="id" id="checkSource" value="checkSource">
+                    <br>
+                    <label>Select Target:</label>
+                    <input type="radio" name="id" id="checkTarget" value="checkTarget">
+                    <br>
+                    <label>Select Wall:</label>
+                    <input type="radio" name="id" id="checkWall" value="checkWall">
+                    <br>
+                    <label>Select Blank:</label>
+                    <input type="radio" name="id" id="checkBlank" value="checkBlank">
+            </fieldset>
+        </div>
+    </div>
+    <br>
+
+    <div id="main_contents">
+        <div id="p5canvas">
+            <!-- Space for p5 canvas here! -->
+        </div>
+
+        <div id="description">
+            <h2>A* Search Algorithm</h2>
+            <p>In A* we begin with a 'source' and a 'target' node and a queue for visiting nodes; the frontier. We also use a temporary array for the neighboring nodes.</P>
+            <p>From the 'source' node we check all neighbors: North, South, East and West.</p>
+            <p>Each of these neighbors is marked as visited, and removed from the frontier queue.</p>
+            <p>We continue iterating until we have searched all nodes or we break early if 'target found'.</p>
+            <p>The source node is blue, with the target node being red, and the wall being black.</p>
+        </div>
+    </div>
+    <p>After starting the search with 'Go For It!' the green nodes represent all the nodes on the frontier that have been checked. And if a path is found, this will be show in teal.</p>
+    <p>You can change the grid size and wall frequency via a dropdown or just Update Grid for a new random grid.</p>
+    <strong>Please note: </strong>The animation has been slowed, so, you have a chance to see the process.
+    <!-- Handle the UI elements -->
+    <script>
+        function updateGrid()
+        {
+            makeGrid();
+        }
+
+        function goForIt()
+        {
+            goForIt();
+        }
+
+        document.getElementById("selectGridSize").onchange = function()
+        {
+            makeGrid();
+        }
+
+        document.getElementById("selectWallFrequency").onchange = function()
+        {
+            makeGrid();
+        }
+    </script>
+
+    <script src="includes/js/p5.min.js"></script>
+    <!-- <script src="includes/js/addons/p5.dom.min.js"></script>
+    <script src="includes/js/addons/p5.sound.min.js"></script> -->
+
+    <script src="includes/js/GridNode.js"></script>
+    <script src="includes/js/AI_maths_lib.js"></script>
+    <script src="includes/js/Bfs.js"></script>
+    <script src="includes/js/sketch.js"></script>
+
+
+    <!-- <script src="includes/js/canvas.js"></script> -->
+</body>
+</html>
