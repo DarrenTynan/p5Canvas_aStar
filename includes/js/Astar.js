@@ -67,7 +67,7 @@ class Astar
                     this.currentNode = this.currentNode.parent;
                 }
 
-                // Itterate over path and set id to 'path'.
+                // Iterate over path and set id to 'path'.
                 var pf;
                 var size = this.path.size();
                 for (var p = 0; p < size; p++)
