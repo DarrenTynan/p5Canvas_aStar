@@ -141,12 +141,15 @@ function draw()
                     astar.openSet[i].draw();
                 }
             }
+        }
 
+        if (astar != null && astar.closeSet.length > 0)
+        {
             for (var i = 0; i < astar.closeSet.length; i++)
             {
-                if (astar.closeSet[i].id != 'source')
+                if (astar.closeSet[i].id != "source")
                 {
-                    astar.closeSet[i].draw();
+                    astar.closeSet[i].drawSet("#dddadd");
                 }
             }
         }

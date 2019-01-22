@@ -66,7 +66,6 @@ class Astar
                 if (this.openSet[i].f < this.openSet[lowF].f || 
                     this.openSet[i].f == this.openSet[lowF].f && 
                     this.openSet[i].h < this.openSet[lowF].h)
-//                if (this.openSet[i].f < this.openSet[lowF].f)
                 {
                     lowF = i;
                 }
@@ -75,14 +74,6 @@ class Astar
             // Set lowF as current node
             this.currentNode = this.openSet[lowF];
          
-            //gfx debug
-            if (this.currentNode != this.sourceNode)
-            {
-                this.currentNode.id = "debug";
-            }
-
-            console.log(this.currentNode);
-
             // Remove lowF from the open set
             this.openSet.splice( this.openSet.indexOf(this.currentNode), 1);
 
@@ -95,6 +86,8 @@ class Astar
                 console.log("DONE");
                 console.log("close set length:");
                 console.log(this.closeSet.length);
+                noLoop();
+                return;
             }
 
             // Clear neighbors array
@@ -106,13 +99,22 @@ class Astar
             // Iterate over neighbors.
             for (var i = 0; i < this.neighbors.length; i++)
             {
-                if (!this.closeSet.includes(this.neighbors[i]) && this.neighbors[i].id != "wall")
+                if (this.closeSet.includes(this.neighbors[i]) || this.neighbors[i].id == "wall")
+                {
+                    continue;
+                }
+
+                // if (!this.closeSet.includes(this.neighbors[i]) || this.neighbors[i].id != "wall")
+                else
                 {
                     // Set parent node for path creation.
                     this.neighbors[i].parent = this.currentNode;
 
                     // gfx debug
-                    this.neighbors[i].id = "frontier";
+                    if (this.neighbors[i].id != "source")
+                    {
+                        this.neighbors[i].id = "frontier";
+                    }
 
                     // Calculate costs.
                     this.neighbors[i].g += this.currentNode.g;
@@ -125,53 +127,8 @@ class Astar
                         this.openSet.push(this.neighbors[i]);
                     }
                 }
-
-
             }
-            
-            // Remove from open set
-            // this.openSet.splice( this.openSet.indexOf(this.currentNode), 1);
-
-            // Add to close set
-            // this.closeSet.push(this.currentNode);
-
-
-            // this.findNeighbors(this.grid, this.currentNode);
-
-            // // Iterate over neighbors.
-            // for (var i = 0; i < this.neighbors.length; i++)
-            // {
-            //     if (!this.closeSet.includes(this.neighbors[i]))
-            //     {
-            //         console.log("debug");
-            //         // Set the cost
-            //         var temp = this.currentNode.g + 10;
-
-            //         if (this.openSet.includes(this.neighbors[i]))
-            //         {
-            //             if (temp < this.neighbors[i].g)
-            //             {
-            //                 this.neighbors[i].g = temp;
-            //             }
-            //             else
-            //             {
-            //                 this.neighbors[i].g = temp;
-            //                 this.openSet.push(this.neighbors[i]);
-            //             }
-
-            //             this.neighbors[i].h = this.heuristic(this.neighbors[i], this.targetNode);
-            //             this.neighbors[i].f = this.neighbors[i].g = this.neighbors[i].h;
-            //         }
-            //     }
-
-                // Set parent node for path creation.
-                // this.neighbors[i].parent = this.currentNode;
-
-
-                // And push onto the open set.
-                // this.openSet.push(this.neighbors[i]);
-            // }
-        // }
+    // {
     }
 
     heuristic_Manhatten(s, t)

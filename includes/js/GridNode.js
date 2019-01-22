@@ -21,8 +21,6 @@ class GridNode
         this.size = _size;
         // The offset in pixels to be subtracted.
         this.offset = 2;
-        // Has it previously been visited.
-        this.visited = false;
         // Where did it come from? (parent)
         this.parent = null;
         // Costs of node
@@ -63,6 +61,12 @@ class GridNode
                 noFill();
         }
 
+        rect(this.drawX + this.offset, this.drawY + this.offset, this.size - this.offset*2, this.size - this.offset*2, 5);
+    }
+
+    drawSet(fillColor)
+    {
+        fill(fillColor);
         rect(this.drawX + this.offset, this.drawY + this.offset, this.size - this.offset*2, this.size - this.offset*2, 5);
     }
 }
