@@ -1,13 +1,13 @@
 class GridNode
 {
-    constructor(_nodeX, _nodeY, _drawX, _drawY, _size, _wallFrequency)
+    constructor(_nodeY, _nodeX, _drawY, _drawX, _size, _wallFrequency)
     {
         // Node position in grid.
-        this.x = _nodeX;
         this.y = _nodeY;
+        this.x = _nodeX;
         // Draw position coordinates.
-        this.drawX = _drawX;
         this.drawY = _drawY;
+        this.drawX = _drawX;
         // Id of node: blank, source, target, wall, etc.
         if (random(1) < _wallFrequency)
         {
@@ -25,6 +25,13 @@ class GridNode
         this.visited = false;
         // Where did it come from? (parent)
         this.parent = null;
+        // Costs of node
+        // f(n) = g(n) + h(n)
+        // g(n) is the cost between start node and current node.
+        // h(n) is the heuristic (10 = up/down left/right. 14 = diagonal).
+        this.f = 0;
+        this.g = 0;
+        this.h = 0;
     }
 
     draw()
@@ -48,6 +55,9 @@ class GridNode
                 break;
             case("path"):
                 fill(0,255,255);
+                break;
+            case("debug"):
+                fill(255,255,0);
                 break;
             default:
                 noFill();

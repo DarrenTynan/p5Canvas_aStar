@@ -104,7 +104,7 @@ class Dictionary
 
 
 /**
- * The queue datastructure is First In First Out.
+ * The queue data structure is First In First Out.
  */
 class Queue
 {

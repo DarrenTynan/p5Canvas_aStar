@@ -1,5 +1,5 @@
 /**
- * Bredth First Search
+ * Breadth First Search
  */
 class Astar
 {
@@ -7,10 +7,10 @@ class Astar
      * Constructor
      * 
      * @param {*} grid - pointer to grid 
-     * @param {*} cols - actual number of columns
-     * @param {*} rows a actual number of rows
+     * @param {*} rows a actual number of rows (y)
+     * @param {*} cols - actual number of columns (x)
      */
-    constructor(grid, cols, rows)
+    constructor(grid, rows, cols)
     {
         // Grid
         this.grid = grid;
@@ -24,13 +24,18 @@ class Astar
         this.targetNode = null;
         this.currentNode = null;
 
+        // bfs
         this.frontier = [];
         this.neighbors = [];
         this.path = new Queue;
+
+        // astar
+        this.openSet = [];
+        this.closeSet = [];
     }
 
     /**
-     * Initialisation
+     * Initialization
      * 
      * @param {*} sourceNode 
      * @param {*} targetNode 
@@ -42,110 +47,207 @@ class Astar
 
         // Initial frontier to search from.
         this.frontier.push(this.sourceNode);
+
+        // astar
+        this.openSet.push(this.sourceNode);
+        let h = this.heuristic_Diagonal(this.targetNode, this.sourceNode);
+        console.log("h: " + h);
     }
 
-    /**
-     * Start the bfs.
-     */
     findPath()
     {
-        // while (this.frontier.length > 0)
+        // while (this.openSet.length > 0)
         // {
-            // Clear neighbors array
-            this.neighbors = [];
 
-            // 1. Remove from frontier
-            this.currentNode = this.frontier.shift();
+            // Find the node with the lowest f on the open set
+            let lowF = 0;
+            for (let i = 0; i < this.openSet.length; i++)
+            {
+                if (this.openSet[i].f < this.openSet[lowF].f || 
+                    this.openSet[i].f == this.openSet[lowF].f && 
+                    this.openSet[i].h < this.openSet[lowF].h)
+//                if (this.openSet[i].f < this.openSet[lowF].f)
+                {
+                    lowF = i;
+                }
+            }
+
+            // Set lowF as current node
+            this.currentNode = this.openSet[lowF];
+         
+            //gfx debug
+            if (this.currentNode != this.sourceNode)
+            {
+                this.currentNode.id = "debug";
+            }
+
+            console.log(this.currentNode);
+
+            // Remove lowF from the open set
+            this.openSet.splice( this.openSet.indexOf(this.currentNode), 1);
+
+            // Add to close set
+            this.closeSet.push(this.currentNode);
 
             // Are we done?
             if (this.currentNode == this.targetNode)
             {
-                // Build path from parents.
-                while (this.currentNode != this.sourceNode)
-                {
-                    this.path.enqueue(this.currentNode);
-                    this.currentNode = this.currentNode.parent;
-                }
-
-                // Iterate over path and set id to 'path'.
-                var pf;
-                var size = this.path.size();
-                for (var p = 0; p < size; p++)
-                {
-                    pf = this.path.dequeue();
-                    pf.id = "path";
-                    pf.draw();
-                }
-
-                this.frontier.length = 0;
-                noLoop();
-                return;
+                console.log("DONE");
+                console.log("close set length:");
+                console.log(this.closeSet.length);
             }
-            
-            // 2. Increase frontier (find all neighbors)
-            this.increaseFrontier(this.grid, this.currentNode);
+
+            // Clear neighbors array
+            this.neighbors = [];
+
+            // Find neighbors and set parent to lowF
+            this.findNeighbors(this.grid, this.currentNode);
 
             // Iterate over neighbors.
             for (var i = 0; i < this.neighbors.length; i++)
             {
-                // Check only non-visited neigbor.
-                if (this.neighbors[i].visited == false && this.neighbors[i].id != "wall")
+                if (!this.closeSet.includes(this.neighbors[i]) && this.neighbors[i].id != "wall")
                 {
-                    // Set as visited
-                    this.neighbors[i].visited = true;
-
-                    // GUI section.
-                    if(this.neighbors[i].id != "source")
-                    {
-                        this.neighbors[i].id = "frontier";
-                    }
-
                     // Set parent node for path creation.
                     this.neighbors[i].parent = this.currentNode;
 
-                    // And push onto the frontier.
-                    this.frontier.push(this.neighbors[i]);
-                }
-            }
-        // }
+                    // gfx debug
+                    this.neighbors[i].id = "frontier";
 
+                    // Calculate costs.
+                    this.neighbors[i].g += this.currentNode.g;
+                    // this.neighbors[i].g = this.currentNode.g + this.heuristic(this.neighbors[i], this.currentNode);
+                    this.neighbors[i].h = this.heuristic_Diagonal(this.targetNode, this.neighbors[i]);
+                    this.neighbors[i].f = this.neighbors[i].g + this.neighbors[i].h;
+    
+                    if (!this.openSet.includes(this.neighbors[i]))
+                    {
+                        this.openSet.push(this.neighbors[i]);
+                    }
+                }
+
+
+            }
+            
+            // Remove from open set
+            // this.openSet.splice( this.openSet.indexOf(this.currentNode), 1);
+
+            // Add to close set
+            // this.closeSet.push(this.currentNode);
+
+
+            // this.findNeighbors(this.grid, this.currentNode);
+
+            // // Iterate over neighbors.
+            // for (var i = 0; i < this.neighbors.length; i++)
+            // {
+            //     if (!this.closeSet.includes(this.neighbors[i]))
+            //     {
+            //         console.log("debug");
+            //         // Set the cost
+            //         var temp = this.currentNode.g + 10;
+
+            //         if (this.openSet.includes(this.neighbors[i]))
+            //         {
+            //             if (temp < this.neighbors[i].g)
+            //             {
+            //                 this.neighbors[i].g = temp;
+            //             }
+            //             else
+            //             {
+            //                 this.neighbors[i].g = temp;
+            //                 this.openSet.push(this.neighbors[i]);
+            //             }
+
+            //             this.neighbors[i].h = this.heuristic(this.neighbors[i], this.targetNode);
+            //             this.neighbors[i].f = this.neighbors[i].g = this.neighbors[i].h;
+            //         }
+            //     }
+
+                // Set parent node for path creation.
+                // this.neighbors[i].parent = this.currentNode;
+
+
+                // And push onto the open set.
+                // this.openSet.push(this.neighbors[i]);
+            // }
+        // }
+    }
+
+    heuristic_Manhatten(s, t)
+    {
+        let dx = abs(s.x - t.x)
+        let dy = abs(s.y - t.y);
+        let d = 10;
+        return d * (dx + dy);
+    }
+
+    heuristic_Diagonal(s, t)
+    {
+        let dx = abs(s.x - t.x)
+        let dy = abs(s.y - t.y);
+        let d = 10;
+        let d2 = 10;
+        return d * (dx + dy) + (d2 - 2 * d) * min(dx, dy);
     }
 
     /**
-     * Increase the frontier from current node.
+     * Find neighbors of current node.
      * But, only if, it's not been previously visited.
      * 
      * @param {*} grid 
      * @param {*} node 
      */
-    increaseFrontier(grid, node)
+    findNeighbors(grid, node)
     {
         // North
         if (node.y > 0)
         {
-            if (this.grid[node.x][node.y - 1].visited == false)
-            this.neighbors.push(grid[node.x][node.y - 1]);
+            grid[node.y - 1][node.x].g = 10;
+            this.neighbors.push(grid[node.y - 1][node.x]);
+        }
+        // NW
+        if (node.y > 0 && node.x > 0)
+        {
+            grid[node.y - 1][node.x - 1].g = 14;
+            this.neighbors.push(grid[node.y - 1][node.x - 1]);
         }
         // West
         if (node.x > 0)
         {
-            if (this.grid[node.x - 1][node.y].visited == false)
-            this.neighbors.push(grid[node.x - 1][node.y]);
+            grid[node.y][node.x - 1].g = 10;
+            this.neighbors.push(grid[node.y][node.x - 1]);
+        }
+        // SW
+        if (node.y < this.rows && node.x > 0)
+        {
+            grid[node.y + 1][node.x - 1].g = 14;
+            this.neighbors.push(grid[node.y + 1][node.x - 1]);
         }
         // South
         if (node.y < this.rows)
         {
-            if (this.grid[node.x][node.y + 1].visited == false)
-            this.neighbors.push(grid[node.x][node.y + 1]);
+            grid[node.y + 1][node.x].g = 10;
+            this.neighbors.push(grid[node.y + 1][node.x]);
+        }
+        // SE
+        if (node.y < this.rows && node.x < this.cols)
+        {
+            grid[node.y + 1][node.x + 1].g = 14;
+            this.neighbors.push(grid[node.y + 1][node.x + 1]);
         }
         // East
         if (node.x < this.cols)
         {
-            if (this.grid[node.x + 1][node.y].visited == false)
-            this.neighbors.push(grid[node.x + 1][node.y]);
+            grid[node.y][node.x + 1].g = 10;
+            this.neighbors.push(grid[node.y][node.x + 1]);
         }
-
+        // NE
+        if (node.y > 0 && node.x < this.cols)
+        {
+            grid[node.y - 1][node.x + 1].g = 14;
+            this.neighbors.push(grid[node.y - 1][node.x + 1]);
+        }
     }
-
 }
 

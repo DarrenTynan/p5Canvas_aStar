@@ -31,16 +31,24 @@
                         <td id="debug_id"></td>
                     </tr>
                     <tr>
-                        <td>Node.f cost:</td>
+                        <td>f cost:</td>
                         <td id="debug_fcost"></td>
                     </tr>
                     <tr>
-                        <td>Node.g cost:</td>
+                        <td>g cost from S:</td>
                         <td id="debug_gcost"></td>
                     </tr>
                     <tr>
-                        <td>Node.h cost:</td>
+                        <td>h cost from T:</td>
                         <td id="debug_hcost"></td>
+                    </tr>
+                    <tr>
+                        <td>Parent.x:</td>
+                        <td id="debug_parentX"></td>
+                    </tr>
+                    <tr>
+                        <td>Parent.y:</td>
+                        <td id="debug_parentY"></td>
                     </tr>
                 </table>
             </fieldset>
@@ -64,15 +72,16 @@
                 <br>
                 <label for="selectWallFrequency">Wall Frequency: </label>
                 <select id="selectWallFrequency">
-                    <option value="0">None</option>
+                    <option value="0" selected="selected">None</option>
                     <option value=".1">10%</option>
-                    <option value=".2" selected="selected">20%</option>
+                    <option value=".2">20%</option>
                     <option value=".3">30%</option>
                     <option value=".4">40%</option>
                 </select>
             </fieldset>
             <button type="button" id="updateGrid" onclick="updateGrid()">Update Grid!</button>
             <button type="button" id="goForIt" onclick="goForIt()">Go For It!</button>
+            <button type="button" onclick="step_Btn()">Step Into</button>
         </div>
 
         <div id="right_panel">
@@ -105,7 +114,7 @@
 
         <div id="description">
             <h2>A* Search Algorithm</h2>
-            <p>In A* we begin with a 'source' and a 'target' node and a queue for visiting nodes; the frontier. We also use a temporary array for the neighboring nodes.</P>
+            <p>In A* we begin with a Source and a Target node, openSet and closeSet. We also use a temporary array for the neighboring nodes.</P>
             <p>From the 'source' node we check all neighbors: North, South, East and West.</p>
             <p>Each of these neighbors is marked as visited, and removed from the frontier queue.</p>
             <p>We continue iterating until we have searched all nodes or we break early if 'target found'.</p>
@@ -115,6 +124,37 @@
     <p>After starting the search with 'Go For It!' the green nodes represent all the nodes on the frontier that have been checked. And if a path is found, this will be show in teal.</p>
     <p>You can change the grid size and wall frequency via a dropdown or just Update Grid for a new random grid.</p>
     <strong>Please note: </strong>The animation has been slowed, so, you have a chance to see the process.
+    <p>g = the movement cost to move from the starting point to a given square on the grid, following the path generated to get there.</p>
+    <p>h = the estimated movement cost to move from that given square on the grid to the final destination. This is often referred to as the heuristic, which is nothing but a kind of smart guess. We really don’t know the actual distance until we find the path, because all sorts of things can be in the way (walls, water, etc.). There can be many ways to calculate this ‘h’ which are discussed in the later sections.</p>
+
+    <p>
+    init openSet (contains calculated f cost nodes)<br>
+    init closesSet (contains valueated nodes)<br>
+    add start node to openSet<br>
+    <br>
+    main loop
+    <ul>
+        <li>currentNode = node in the openSet with lowest f</li>
+        <li>remove currentNode from openSet</li>
+        <li>add currentNode to closeSet</li>
+        <br>
+        <li>if currentNode is the target node<br>
+        <span class="tab">return</span></li><br>
+
+        <li>for each neighbor of the currentNode</li><br>
+
+        <span class="tab"><li>if neighbor is not traversable or neighbor is in closeSet</li></span><br>
+        <span class="tab2">skip to the next neighbor</li></span><br><br>
+
+        <span class="tab"><li>if new path to neighbor is shorter OR neighbor is not in openSet<br>
+        <span class="tab">set f of neighbor</span><br>
+        <span class="tab">set parent of neighbor to currentNode</span><br>
+        <span class="tab"><li>if neighbor is not in openSet</span><br>
+        <span class="tab">add neighbor to openSet</li></span><br>
+    </li>
+    </ul>
+    </p>
+
     <!-- Handle the UI elements -->
     <script>
         function updateGrid()
@@ -125,6 +165,11 @@
         function goForIt()
         {
             goForIt();
+        }
+
+        function step_Btn()
+        {
+            step();
         }
 
         document.getElementById("selectGridSize").onchange = function()
@@ -144,7 +189,7 @@
 
     <script src="includes/js/GridNode.js"></script>
     <script src="includes/js/AI_maths_lib.js"></script>
-    <script src="includes/js/Bfs.js"></script>
+    <script src="includes/js/Astar.js"></script>
     <script src="includes/js/sketch.js"></script>
 
 

@@ -68,3 +68,14 @@ html body
     margin-top: 10px;
     width: 100%;
 }
+
+.tab
+{ 
+    display:inline-block; 
+    margin-left: 20px; 
+}
+.tab2
+{ 
+    display:inline-block; 
+    margin-left: 40px; 
+}

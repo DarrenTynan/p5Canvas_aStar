@@ -1,12 +1,12 @@
 // Pointers
 let p5canvas;
-let bfs;
+let astar;
 
 // The grid of nodes displayed on screen.
 let grid = [];
 
 // The following are calculated from UI settings.
-let number_of_columns;
+let number_of_cols;
 let number_of_rows;
 let size_of_tile;
 
@@ -41,12 +41,12 @@ function makeGrid()
 {
     // Clear vars for 'Update Grid!'.
     background(255);
-    bfs = null;
+    astar = null;
     grid = [];
     source = null;
     target = null;
 
-    // Get the wall frequncy
+    // Get the wall frequency
     var e = document.getElementById("selectWallFrequency");
     var wallFrequency = e.options[e.selectedIndex].value;
 
@@ -54,21 +54,21 @@ function makeGrid()
     e = document.getElementById("selectGridSize");
     size_of_tile = p5canvas.width / e.options[e.selectedIndex].value;
 
-    number_of_columns = Math.floor(p5canvas.width / size_of_tile);
+    number_of_cols = Math.floor(p5canvas.width / size_of_tile);
     number_of_rows = Math.floor(p5canvas.height / size_of_tile);
 
     // Create empty array.
-    grid = make2Darray(number_of_columns, number_of_rows);
+    grid = make2Darray(number_of_rows, number_of_cols);
 
     var xPos = 0;
     var yPos = 0;
 
     // Fill array with GridNode instances
-    for (var i = 0; i < number_of_columns; i++)
+    for (var r = 0; r < number_of_rows; r++)
     {
-        for (var j = 0; j < number_of_rows; j++)
+        for (var c = 0; c < number_of_cols; c++)
         {
-            grid[i][j] = new GridNode(i, j, xPos, yPos, size_of_tile, wallFrequency);
+            grid[r][c] = new GridNode(r, c, yPos, xPos, size_of_tile, wallFrequency);
             xPos += size_of_tile;
         }
         // Reset xPos to start of row.
@@ -77,13 +77,22 @@ function makeGrid()
         // And increase the y position for 1 node down.
         yPos += size_of_tile;
     }
+        // y x
+        grid[1][1].id = 'source';
+        source = grid[1][1];
+
+        // grid[5][0].parent = source;
+        // console.log("test parent set");
+
+        grid[0][14].id = 'target';
+        target = grid[0][14];
 
     // Initial draw of grid.
-    for (var i = 0; i < number_of_columns; i++)
+    for (var r = 0; r < number_of_rows; r++)
     {
-        for (var j = 0; j < number_of_rows; j++)
+        for (var c = 0; c < number_of_cols; c++)
         {
-            grid[i][j].draw();
+            grid[r][c].draw();
         }
     }
 
@@ -92,15 +101,15 @@ function makeGrid()
 /**
  * Helper function to create 2d array.
  * 
- * @param {*} cols 
- * @param {*} rows 
+ * @param {*} rows (y)
+ * @param {*} cols (x)
  */
-function make2Darray(cols, rows)
+function make2Darray(rows, cols)
 {
-    var arr = new Array(cols);
+    var arr = new Array(rows);
     for (var i = 0; i < arr.length; i++)
     {
-        arr[i] = new Array(rows);
+        arr[i] = new Array(cols);
     }
     return arr;
 }
@@ -113,23 +122,31 @@ function draw()
 {
     if (grid)
     {
-        counter = counter + 1;
-        if (counter > 10)
-        {
-            counter = 0;
-            if (bfs != null && bfs.frontier.length > 0)
-            {
-                bfs.findPath();
-            }
-        }
+    //     counter = counter + 1;
+    //     if (counter > 10)
+    //     {
+    //         counter = 0;
+    //         if (astar != null && astar.frontier.length > 0)
+    //         {
+    //             astar.findPath();
+    //         }
+    //     }
 
-        if (bfs != null && bfs.frontier.length > 0)
+        if (astar != null && astar.openSet.length > 0)
         {
-            for (var i = 0; i < bfs.frontier.length; i++)
+            for (var i = 0; i < astar.openSet.length; i++)
             {
-                if (bfs.frontier[i].id != 'source')
+                if (astar.openSet[i].id != 'source')
                 {
-                    bfs.frontier[i].draw();
+                    astar.openSet[i].draw();
+                }
+            }
+
+            for (var i = 0; i < astar.closeSet.length; i++)
+            {
+                if (astar.closeSet[i].id != 'source')
+                {
+                    astar.closeSet[i].draw();
                 }
             }
         }
@@ -173,6 +190,19 @@ function checkCanvasMouse()
         document.getElementById('debug_nodeX').innerHTML = nx;
         document.getElementById('debug_nodeY').innerHTML = ny;
         document.getElementById('debug_id').innerHTML = grid[ny][nx].id;
+        document.getElementById('debug_fcost').innerHTML = grid[ny][nx].f;
+        document.getElementById('debug_gcost').innerHTML = grid[ny][nx].g;
+        document.getElementById('debug_hcost').innerHTML = grid[ny][nx].h;
+        if(grid[ny][nx].parent == undefined)
+        {
+            document.getElementById('debug_parentX').innerHTML = "null";
+            document.getElementById('debug_parentY').innerHTML = "null";
+        }
+        else
+        {
+            document.getElementById('debug_parentX').innerHTML = grid[ny][nx].parent.x;
+            document.getElementById('debug_parentY').innerHTML = grid[ny][nx].parent.y;
+        }
     }
 
     if (document.getElementById("checkSource").checked)
@@ -215,9 +245,14 @@ function goForIt()
     }
 
     // Initialize the Bfs.
-    bfs = new Bfs(grid, number_of_columns, number_of_rows);
+    astar = new Astar(grid, number_of_rows, number_of_cols);
 
-    bfs.init(source, target);
+    astar.init(source, target);
 
-    bfs.findPath();
+    astar.findPath();
+}
+
+function step()
+{
+    astar.findPath();
 }
