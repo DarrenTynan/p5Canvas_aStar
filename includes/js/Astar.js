@@ -1,5 +1,8 @@
 /**
- * Breadth First Search
+ * A* Search Algorithm
+ * 
+ * @author Darren Tynan
+ * @date Jan 2019
  */
 class Astar
 {
@@ -14,6 +17,7 @@ class Astar
     {
         // Grid
         this.grid = grid;
+
         // Adjustments for number of rows and columns,
         // as array's are zero indexed.
         this.cols = cols - 1;
@@ -24,14 +28,13 @@ class Astar
         this.targetNode = null;
         this.currentNode = null;
 
-        // bfs
-        this.frontier = [];
+        // astar
         this.neighbors = [];
         this.path = new Queue;
 
-        // astar
         this.openSet = [];
         this.closeSet = [];
+        this.isFound = false;
     }
 
     /**
@@ -46,19 +49,19 @@ class Astar
         this.targetNode = targetNode;
 
         // Initial frontier to search from.
-        this.frontier.push(this.sourceNode);
-
-        // astar
         this.openSet.push(this.sourceNode);
-        let h = this.heuristic_Diagonal(this.targetNode, this.sourceNode);
-        console.log("h: " + h);
     }
 
+    /**
+     * The most intensive part of the process is the
+     * sub-routine too search the openSet for the node
+     * with the lowest f cost.
+     * An optimized alternative would be to use a heap.  
+     */
     findPath()
     {
-        // while (this.openSet.length > 0)
-        // {
-
+        while (this.openSet.length > 0)
+        {
             // Find the node with the lowest f on the open set
             let lowF = 0;
             for (let i = 0; i < this.openSet.length; i++)
@@ -83,17 +86,36 @@ class Astar
             // Are we done?
             if (this.currentNode == this.targetNode)
             {
-                console.log("DONE");
-                console.log("close set length:");
-                console.log(this.closeSet.length);
+                this.isFound = true;
+
+                // Stop the sketch.js draw() loop.
                 noLoop();
+
+                console.log("DONE");
+                while (this.currentNode != this.sourceNode)
+                {
+                    this.path.enqueue(this.currentNode);
+                    this.currentNode = this.currentNode.parent;
+                }
+
+                // iterate over path and set id to 'path'.
+                let pf;
+                let size = this.path.size();
+                for (let p = 0; p < size; p++)
+                {
+                    pf = this.path.dequeue();
+                    pf.id = "path";
+                    // Yellow
+                    pf.drawSet("#FFF700");
+                }
+
                 return;
             }
 
-            // Clear neighbors array
+            // Clear neighbors array for next iteration.
             this.neighbors = [];
 
-            // Find neighbors and set parent to lowF
+            // Find neighbors of current node.
             this.findNeighbors(this.grid, this.currentNode);
 
             // Iterate over neighbors.
@@ -128,10 +150,18 @@ class Astar
                     }
                 }
             }
-    // {
+        }
     }
 
-    heuristic_Manhatten(s, t)
+    /**
+     * Calculate the heuristic cost between Source and Target node.
+     * Based on Manhattan ie North, East, South, West.
+     * With a cost of 10.
+     *  
+     * @param {*} s 
+     * @param {*} t 
+     */
+    heuristic_Manhattan(s, t)
     {
         let dx = abs(s.x - t.x)
         let dy = abs(s.y - t.y);
@@ -139,6 +169,14 @@ class Astar
         return d * (dx + dy);
     }
 
+    /**
+     * Calculate the heuristic cost between Source and Target node.
+     * Based on 8-way direction.
+     * With cost of 10 and 14 for diagonal.
+     * 
+     * @param {*} s 
+     * @param {*} t 
+     */
     heuristic_Diagonal(s, t)
     {
         let dx = abs(s.x - t.x)

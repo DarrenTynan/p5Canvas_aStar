@@ -1,3 +1,14 @@
+/**
+ * Grid Node class
+ * 
+ * @author Darren Tynan
+ * @date Jan 2019
+ *
+ * Each node on the grid has an instance with:
+ * node x/y position
+ * draw x/y position and size
+ * the wall frequency percentage so as walls can be selected at random.
+ */
 class GridNode
 {
     constructor(_nodeY, _nodeX, _drawY, _drawX, _size, _wallFrequency)
@@ -32,6 +43,9 @@ class GridNode
         this.h = 0;
     }
 
+    /**
+     * Draw function based on instance id for color selection.
+     */
     draw()
     {
         switch(this.id)
@@ -52,7 +66,7 @@ class GridNode
                 fill(0,255,0);
                 break;
             case("path"):
-                fill(0,255,255);
+                fill(255,247,0);
                 break;
             case("debug"):
                 fill(255,255,0);
@@ -64,6 +78,11 @@ class GridNode
         rect(this.drawX + this.offset, this.drawY + this.offset, this.size - this.offset*2, this.size - this.offset*2, 5);
     }
 
+    /**
+     * Draw function based on passed in fill color.
+     * 
+     * @param {*} fillColor 
+     */
     drawSet(fillColor)
     {
         fill(fillColor);

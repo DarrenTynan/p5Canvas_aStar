@@ -1,3 +1,13 @@
+/**
+ * The main sketch file.
+ * 
+ * @author Darren Tynan
+ * @date Jan 2019
+ *
+ * Responsible for UI interface, event handling
+ * and drawing calls
+ */
+
 // Pointers
 let p5canvas;
 let astar;
@@ -35,6 +45,7 @@ function setup()
     p5canvas.mousePressed(checkCanvasMouse);
 
     makeGrid();
+    frameRate(2);
 }
 
 function makeGrid()
@@ -43,8 +54,6 @@ function makeGrid()
     background(255);
     astar = null;
     grid = [];
-    source = null;
-    target = null;
 
     // Get the wall frequency
     var e = document.getElementById("selectWallFrequency");
@@ -77,15 +86,11 @@ function makeGrid()
         // And increase the y position for 1 node down.
         yPos += size_of_tile;
     }
-        // y x
-        grid[1][1].id = 'source';
-        source = grid[1][1];
 
-        // grid[5][0].parent = source;
-        // console.log("test parent set");
-
-        grid[0][14].id = 'target';
-        target = grid[0][14];
+    // Temporary source and target node for the GUI.
+    // Pre-set to arbitrary 
+    source = grid[0][0];
+    target = grid[0][1];
 
     // Initial draw of grid.
     for (var r = 0; r < number_of_rows; r++)
@@ -117,39 +122,28 @@ function make2Darray(rows, cols)
 /**
  * Loop through grid and call draw.
  */
-var counter = 0;
 function draw()
 {
-    if (grid)
+    if (grid && astar != null)
     {
-    //     counter = counter + 1;
-    //     if (counter > 10)
-    //     {
-    //         counter = 0;
-    //         if (astar != null && astar.frontier.length > 0)
-    //         {
-    //             astar.findPath();
-    //         }
-    //     }
-
-        if (astar != null && astar.openSet.length > 0)
+        if (astar.openSet.length > 0)
         {
             for (var i = 0; i < astar.openSet.length; i++)
             {
-                if (astar.openSet[i].id != 'source')
+                if (astar.openSet[i].id != "source" || astar.openSet[i].id != "path")
                 {
                     astar.openSet[i].draw();
                 }
             }
         }
 
-        if (astar != null && astar.closeSet.length > 0)
+        if (astar.closeSet.length > 0)
         {
             for (var i = 0; i < astar.closeSet.length; i++)
             {
-                if (astar.closeSet[i].id != "source")
+                if (astar.closeSet[i].id != "source" || astar.closeSet[i].id != "path")
                 {
-                    astar.closeSet[i].drawSet("#dddadd");
+                    astar.closeSet[i].draw();
                 }
             }
         }
@@ -210,6 +204,9 @@ function checkCanvasMouse()
 
     if (document.getElementById("checkSource").checked)
     {
+        grid[source.y][source.x].id = "blank";
+        grid[source.y][source.x].draw();
+
         grid[ny][nx].id = "source";
         source = grid[ny][nx];
         grid[ny][nx].draw();
@@ -217,6 +214,9 @@ function checkCanvasMouse()
 
     if (document.getElementById("checkTarget").checked)
     {
+        grid[target.y][target.x].id = "blank";
+        grid[target.y][target.x].draw();
+
         grid[ny][nx].id = "target";
         target = grid[ny][nx];
         grid[ny][nx].draw();
@@ -252,10 +252,5 @@ function goForIt()
 
     astar.init(source, target);
 
-    astar.findPath();
-}
-
-function step()
-{
     astar.findPath();
 }
